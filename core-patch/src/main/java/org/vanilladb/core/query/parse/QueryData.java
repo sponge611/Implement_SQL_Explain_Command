@@ -33,6 +33,7 @@ public class QueryData {
 	private Set<AggregationFn> aggFn;
 	private List<String> sortFields;
 	private List<Integer> sortDirs;
+	private boolean isExplain;
 
 
 	/**
@@ -54,7 +55,7 @@ public class QueryData {
 	 *            a list of sort directions
 	 */
 	public QueryData(Set<String> projFields, Set<String> tables, Predicate pred,
-			Set<String> groupFields, Set<AggregationFn> aggFn, List<String> sortFields, List<Integer> sortDirs) {
+			Set<String> groupFields, Set<AggregationFn> aggFn, List<String> sortFields, List<Integer> sortDirs, boolean isExplain) {
 
 		this.projFields = projFields;
 		this.tables = tables;
@@ -63,6 +64,7 @@ public class QueryData {
 		this.aggFn = aggFn;
 		this.sortFields = sortFields;
 		this.sortDirs = sortDirs;
+		this.isExplain = isExplain;
 	}
 
 	/**
@@ -129,7 +131,15 @@ public class QueryData {
 	public Set<AggregationFn> aggregationFn() {
 		return aggFn;
 	}
-
+	
+	/**
+	 * Return true if the query contain keyword explain; false for vice versa.
+	 * 
+	 * @return boolean value represent the existence of explain in query  
+	 */
+	public boolean explainExist() {
+		return isExplain;
+	}
 
 
 	public String toString() {
