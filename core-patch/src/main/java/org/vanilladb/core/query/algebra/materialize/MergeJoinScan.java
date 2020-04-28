@@ -26,6 +26,8 @@ public class MergeJoinScan implements Scan {
 	private SortScan ss2;
 	private String fldName1, fldName2;
 	private Constant joinVal = null;
+	private long blockAccess = 0;
+	private long recordsOutput = 0;
 
 	/**
 	 * Creates a mergejoin scan for the two underlying sorted scans.
@@ -45,6 +47,16 @@ public class MergeJoinScan implements Scan {
 		this.ss2 = ss2;
 		this.fldName1 = fldName1;
 		this.fldName2 = fldName2;
+	}
+	
+	public MergeJoinScan(SortScan ss1, SortScan ss2, String fldName1,
+			String fldName2, long blockAccess, long recordsOutput) {
+		this.ss1 = ss1;
+		this.ss2 = ss2;
+		this.fldName1 = fldName1;
+		this.fldName2 = fldName2;
+		this.blockAccess = blockAccess;
+		this.recordsOutput = recordsOutput;
 	}
 
 	/**
@@ -132,5 +144,18 @@ public class MergeJoinScan implements Scan {
 	@Override
 	public boolean hasField(String fldName) {
 		return ss1.hasField(fldName) || ss2.hasField(fldName);
+	}
+
+	@Override
+	public String TraverseScanForMeta(int level) {
+		String space_str = " ";
+		for(int i =0; i < 2*level; i++) {
+			space_str = space_str + " ";
+		}
+		String explain_str = space_str + "->MergeJoinPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		explain_str = explain_str + ss1.TraverseScanForMeta(level+1);
+		explain_str = explain_str + ss2.TraverseScanForMeta(level+1);
+		return explain_str;
+		
 	}
 }

@@ -27,6 +27,8 @@ import org.vanilladb.core.sql.Constant;
 public class ProjectScan implements Scan {
 	private Scan s;
 	private Collection<String> fieldList;
+	private long blockAccess = 0;
+	private long recordsOutput = 0;
 
 	/**
 	 * Creates a project scan having the specified underlying scan and field
@@ -40,6 +42,13 @@ public class ProjectScan implements Scan {
 	public ProjectScan(Scan s, Collection<String> fieldList) {
 		this.s = s;
 		this.fieldList = fieldList;
+	}
+	
+	public ProjectScan(Scan s, Collection<String> fieldList, long blockAccess, long recordsOutput) {
+		this.s = s;
+		this.fieldList = fieldList;
+		this.blockAccess = blockAccess;
+		this.recordsOutput = recordsOutput;
 	}
 
 	@Override
@@ -73,5 +82,16 @@ public class ProjectScan implements Scan {
 	@Override
 	public boolean hasField(String fldName) {
 		return fieldList.contains(fldName);
+	}
+
+	@Override
+	public String TraverseScanForMeta(int level) {
+		String space_str = " ";
+		for(int i =0; i < 2*level; i++) {
+			space_str = space_str + " ";
+		}
+		String explain_str = space_str + "->ProjectPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		explain_str = explain_str + s.TraverseScanForMeta(level+1);
+		return explain_str;
 	}
 }

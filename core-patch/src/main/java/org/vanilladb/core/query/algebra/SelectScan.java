@@ -26,6 +26,8 @@ import org.vanilladb.core.storage.record.RecordId;
 public class SelectScan implements UpdateScan {
 	private Scan s;
 	private Predicate pred;
+	private long blockAccess = 0;
+	private long recordsOutput = 0;
 
 	/**
 	 * Creates a select scan having the specified underlying scan and predicate.
@@ -38,6 +40,13 @@ public class SelectScan implements UpdateScan {
 	public SelectScan(Scan s, Predicate pred) {
 		this.s = s;
 		this.pred = pred;
+	}
+
+	public SelectScan(Scan s, Predicate pred, long blockAccess, long recordsOutput) {
+		this.s = s;
+		this.pred = pred;
+		this.blockAccess = blockAccess;
+		this.recordsOutput = recordsOutput;
 	}
 
 	// Scan methods
@@ -107,5 +116,16 @@ public class SelectScan implements UpdateScan {
 	public void moveToRecordId(RecordId rid) {
 		UpdateScan us = (UpdateScan) s;
 		us.moveToRecordId(rid);
+	}
+
+	@Override
+	public String TraverseScanForMeta(int level) {
+		String space_str = " ";
+		for(int i =0; i < 2*level; i++) {
+			space_str = space_str + " ";
+		}
+		String explain_str = space_str + "->SelectPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		explain_str = explain_str + s.TraverseScanForMeta(level+1);
+		return explain_str;
 	}
 }

@@ -337,7 +337,7 @@ public class SelectPlan extends ReduceRecordsPlan {
 	@Override
 	public Scan open() {
 		Scan s = p.open();
-		return new SelectScan(s, pred);
+		return new SelectScan(s, pred, this.blocksAccessed(), this.recordsOutput());
 	}
 
 	/**

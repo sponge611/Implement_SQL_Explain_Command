@@ -75,7 +75,7 @@ public class MergeJoinPlan extends AbstractJoinPlan {
 	public Scan open() {
 		SortScan ss1 = (SortScan) sp1.open();
 		SortScan ss2 = (SortScan) sp2.open();
-		return new MergeJoinScan(ss1, ss2, fldName1, fldName2);
+		return new MergeJoinScan(ss1, ss2, fldName1, fldName2, this.blocksAccessed(), this.recordsOutput());
 	}
 
 	/**

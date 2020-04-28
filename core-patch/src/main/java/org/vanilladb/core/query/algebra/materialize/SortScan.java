@@ -33,6 +33,9 @@ public class SortScan implements Scan {
 	private RecordComparator comp;
 	private boolean hasMore1, hasMore2 = false;
 	private List<RecordId> savedPosition;
+	private long blockAccess = 0;
+	private long recordsOutput = 0;
+	private Scan src = null;
 
 	/**
 	 * Creates a sort scan, given a list of 1 or 2 runs. If there is only 1 run,
@@ -44,6 +47,15 @@ public class SortScan implements Scan {
 	 *            the record comparator
 	 */
 	public SortScan(List<TempTable> runs, RecordComparator comp) {
+		this.comp = comp;
+		s1 = (UpdateScan) runs.get(0).open();
+		if (runs.size() > 1)
+			s2 = (UpdateScan) runs.get(1).open();
+	}
+	public SortScan(List<TempTable> runs, RecordComparator comp, long blockAccess, long recordsOutput, Scan src) {
+		this.blockAccess = blockAccess;
+		this.recordsOutput = recordsOutput;
+		this.src = src;
 		this.comp = comp;
 		s1 = (UpdateScan) runs.get(0).open();
 		if (runs.size() > 1)
@@ -106,6 +118,8 @@ public class SortScan implements Scan {
 		s1.close();
 		if (s2 != null)
 			s2.close();
+		if (this.src != null)
+			this.src.close();
 	}
 
 	/**
@@ -147,5 +161,15 @@ public class SortScan implements Scan {
 		s1.moveToRecordId(rid1);
 		if (rid2 != null)
 			s2.moveToRecordId(rid2);
+	}
+	
+	public String TraverseScanForMeta(int level) {
+		String space_str = " ";
+		for(int i =0; i < 2*level; i++) {
+			space_str = space_str + " ";
+		}
+		String explain_str = space_str + "->SortPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		explain_str = explain_str + src.TraverseScanForMeta(level+1);
+		return explain_str;
 	}
 }

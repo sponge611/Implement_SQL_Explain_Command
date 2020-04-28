@@ -24,6 +24,8 @@ import org.vanilladb.core.sql.Constant;
 public class ProductScan implements Scan {
 	private Scan s1, s2;
 	private boolean isLhsEmpty;
+	private long blockAccess = 0;
+	private long recordsOutput = 0;
 
 	/**
 	 * Creates a product scan having the two underlying scans.
@@ -36,6 +38,13 @@ public class ProductScan implements Scan {
 	public ProductScan(Scan s1, Scan s2) {
 		this.s1 = s1;
 		this.s2 = s2;
+		
+	}
+	public ProductScan(Scan s1, Scan s2, long blockAccess, long recordsOutput) {
+		this.s1 = s1;
+		this.s2 = s2;
+		this.blockAccess = blockAccess;
+		this.recordsOutput = recordsOutput;
 	}
 
 	/**
@@ -107,5 +116,17 @@ public class ProductScan implements Scan {
 	@Override
 	public boolean hasField(String fldName) {
 		return s1.hasField(fldName) || s2.hasField(fldName);
+	}
+
+	@Override
+	public String TraverseScanForMeta(int level) {
+		String space_str = " ";
+		for(int i =0; i < 2*level; i++) {
+			space_str = space_str + " ";
+		}
+		String explain_str = space_str + "->ProductPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		explain_str = explain_str + s1.TraverseScanForMeta(level+1);
+		explain_str = explain_str + s2.TraverseScanForMeta(level+1);
+		return explain_str;
 	}
 }

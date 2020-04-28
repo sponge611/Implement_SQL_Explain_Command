@@ -72,7 +72,7 @@ public class ProjectPlan implements Plan {
 	@Override
 	public Scan open() {
 		Scan s = p.open();
-		return new ProjectScan(s, schema.fields());
+		return new ProjectScan(s, schema.fields(),this.blocksAccessed(), this.recordsOutput());
 	}
 
 	/**

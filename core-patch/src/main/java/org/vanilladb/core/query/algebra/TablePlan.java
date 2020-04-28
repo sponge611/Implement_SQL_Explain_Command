@@ -56,7 +56,7 @@ public class TablePlan implements Plan {
 	 */
 	@Override
 	public Scan open() {
-		return new TableScan(ti, tx);
+		return new TableScan(ti, tx, this.blocksAccessed(), this.recordsOutput());
 	}
 
 	/**

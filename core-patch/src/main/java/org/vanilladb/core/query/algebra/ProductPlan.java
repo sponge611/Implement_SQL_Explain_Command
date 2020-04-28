@@ -90,7 +90,7 @@ public class ProductPlan implements Plan {
 	public Scan open() {
 		Scan s1 = p1.open();
 		Scan s2 = p2.open();
-		return new ProductScan(s1, s2);
+		return new ProductScan(s1, s2, this.blocksAccessed(), this.recordsOutput());
 	}
 
 	/**

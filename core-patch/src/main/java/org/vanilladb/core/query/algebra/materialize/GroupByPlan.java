@@ -290,7 +290,7 @@ public class GroupByPlan extends ReduceRecordsPlan {
 	@Override
 	public Scan open() {
 		Scan ss = sp.open();
-		return new GroupByScan(ss, groupFlds, aggFns);
+		return new GroupByScan(ss, groupFlds, aggFns, this.blocksAccessed(), this.recordsOutput());
 	}
 
 	/**

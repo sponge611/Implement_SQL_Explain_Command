@@ -30,6 +30,8 @@ public class GroupByScan implements Scan {
 	private Collection<AggregationFn> aggFns;
 	private GroupValue groupVal;
 	private boolean moreGroups;
+	private long blockAccess = 0;
+	private long recordsOutput = 0;
 
 	/**
 	 * Creates a groupby scan, given a grouped table scan.
@@ -42,11 +44,21 @@ public class GroupByScan implements Scan {
 	 * @param aggFns
 	 *            the aggregation functions
 	 */
+	
 	public GroupByScan(Scan s, Collection<String> groupFlds,
 			Collection<AggregationFn> aggFns) {
 		this.ss = s;
 		this.groupFlds = groupFlds;
 		this.aggFns = aggFns;
+		
+	}
+	public GroupByScan(Scan s, Collection<String> groupFlds,
+			Collection<AggregationFn> aggFns, long blockAccess, long recordsOutput) {
+		this.ss = s;
+		this.groupFlds = groupFlds;
+		this.aggFns = aggFns;
+		this.blockAccess = blockAccess;
+		this.recordsOutput = recordsOutput;
 	}
 
 	/**
@@ -134,5 +146,16 @@ public class GroupByScan implements Scan {
 				if (fn.fieldName().equals(fldname))
 					return true;
 		return false;
+	}
+
+	@Override
+	public String TraverseScanForMeta(int level) {
+		String space_str = " ";
+		for(int i =0; i < 2*level; i++) {
+			space_str = space_str + " ";
+		}
+		String explain_str = space_str + "->GroupbyPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		explain_str = explain_str + ss.TraverseScanForMeta(level+1);
+		return explain_str;
 	}
 }
