@@ -124,7 +124,7 @@ public class SelectScan implements UpdateScan {
 		for(int i =0; i < 2*level; i++) {
 			space_str = space_str + " ";
 		}
-		String explain_str = space_str + "->SelectPlan: (#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
+		String explain_str = space_str + "->SelectPlan: ("+pred.toString()+")(#blks=" + this.blockAccess + ", #records=" + this.recordsOutput + ")\n" ;
 		explain_str = explain_str + s.TraverseScanForMeta(level+1);
 		return explain_str;
 	}
