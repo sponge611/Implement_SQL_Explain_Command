@@ -6,25 +6,27 @@ import org.vanilladb.core.sql.VarcharConstant;
 
 public class ExplainScan implements Scan {
 	private Scan s;
-	private Plan p;
+	private long record_num = 0L;
 	private boolean hasExplained = false;
 	
-	public ExplainScan(Scan s, Plan p) {
+	public ExplainScan(Scan s) {
 		this.s = s;
-		this.p = p;
 	}
 
 	@Override
 	public Constant getVal(String fldName) {
 		// TODO Auto-generated method stub
 		String explain_str = "\n\n" + s.TraverseScanForMeta(1);
-		explain_str = explain_str + "Actual #recs: "+(long)this.p.histogram().recordsOutput();
+		while(s.next()) {
+			record_num++;
+		}
+		explain_str = explain_str + "Actual #recs: "+record_num;
 		return new VarcharConstant(explain_str, Type.VARCHAR(500));
 	}
 
 	@Override
 	public void beforeFirst() {
-		// TODO Auto-generated method stub
+		s.beforeFirst();
 
 	}
 

@@ -22,7 +22,7 @@ public class ExplainPlan implements Plan {
 	public Scan open() {
 		Scan s = p.open();
 		
-		return new ExplainScan(s,p);
+		return new ExplainScan(s);
 	}
 
 	@Override
